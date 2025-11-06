@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace SuporteSpeed.API
 {
     public class Program
@@ -11,6 +13,10 @@ namespace SuporteSpeed.API
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Host.UseSerilog((ctx, lc) =>
+                lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration)
+            );
 
             var app = builder.Build();
 
