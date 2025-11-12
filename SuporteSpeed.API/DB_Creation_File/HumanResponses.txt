@@ -1,0 +1,11 @@
+CREATE TABLE [dbo].[HumanResponses] (
+    [id]               INT            IDENTITY (1, 1) NOT NULL,
+    [ticket_id]        INT            NOT NULL,
+    [support_agent_id] INT            NOT NULL,
+    [message]          NVARCHAR (MAX) NOT NULL,
+    [responded_at]     DATETIME2 (7)  DEFAULT (sysdatetime()) NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [fk_humanresponses_supporttickets] FOREIGN KEY ([ticket_id]) REFERENCES [dbo].[SupportTickets] ([id]) ON DELETE CASCADE,
+    CONSTRAINT [fk_humanresponses_users] FOREIGN KEY ([support_agent_id]) REFERENCES [dbo].[Users] ([Id])
+);
+

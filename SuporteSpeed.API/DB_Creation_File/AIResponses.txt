@@ -1,0 +1,11 @@
+CREATE TABLE [dbo].[AIResponses] (
+    [id]           INT            IDENTITY (1, 1) NOT NULL,
+    [ticket_id]    INT            NOT NULL,
+    [model_name]   NVARCHAR (100) NULL,
+    [message]      NVARCHAR (MAX) NOT NULL,
+    [confidence]   FLOAT (53)     NULL,
+    [responded_at] DATETIME2 (7)  DEFAULT (sysdatetime()) NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [fk_airesponses_supporttickets] FOREIGN KEY ([ticket_id]) REFERENCES [dbo].[SupportTickets] ([id]) ON DELETE CASCADE
+);
+

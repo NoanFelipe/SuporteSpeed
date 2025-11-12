@@ -1,0 +1,12 @@
+CREATE TABLE [dbo].[SupportTickets] (
+    [id]          INT            IDENTITY (1, 1) NOT NULL,
+    [user_id]     INT            NOT NULL,
+    [title]       NVARCHAR (200) NOT NULL,
+    [description] NVARCHAR (MAX) NULL,
+    [field]       NVARCHAR (100) NOT NULL,
+    [status]      NVARCHAR (50)  NULL,
+    [created_at]  DATETIME2 (7)  DEFAULT (sysdatetime()) NULL,
+    PRIMARY KEY CLUSTERED ([id] ASC),
+    CONSTRAINT [fk_supporttickets_users] FOREIGN KEY ([user_id]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE
+);
+
