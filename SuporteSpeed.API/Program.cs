@@ -1,5 +1,6 @@
 using Serilog;
 using Microsoft.EntityFrameworkCore;
+using SuporteSpeed.API.Data;
 
 namespace SuporteSpeed.API
 {
@@ -11,7 +12,7 @@ namespace SuporteSpeed.API
 
             // Add services to the container.
             var connString = builder.Configuration.GetConnectionString("SuporteSpeedAppDbConnection");
-            //builder.Services.AddDbContext<SuporteSpeedDbContext>(options => options.UseSqlServer(connString));
+            builder.Services.AddDbContext<SuporteSpeedDbContext>(options => options.UseSqlServer(connString));
 
 
 
