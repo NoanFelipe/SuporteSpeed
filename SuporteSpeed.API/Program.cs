@@ -1,4 +1,5 @@
 using Serilog;
+using Microsoft.EntityFrameworkCore;
 
 namespace SuporteSpeed.API
 {
@@ -9,6 +10,10 @@ namespace SuporteSpeed.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            var connString = builder.Configuration.GetConnectionString("SuporteSpeedAppDbConnection");
+            //builder.Services.AddDbContext<SuporteSpeedDbContext>(options => options.UseSqlServer(connString));
+
+
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
