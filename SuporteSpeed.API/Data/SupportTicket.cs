@@ -19,7 +19,7 @@ public partial class SupportTicket
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<AiResponse> Airesponses { get; set; } = new List<AiResponse>();
+    public virtual ICollection<Airesponse> Airesponses { get; set; } = new List<Airesponse>();
 
     public virtual ICollection<HumanResponse> HumanResponses { get; set; } = new List<HumanResponse>();
 

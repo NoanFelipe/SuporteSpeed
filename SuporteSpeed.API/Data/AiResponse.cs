@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SuporteSpeed.API.Data;
 
-public partial class AiResponse
+public partial class Airesponse
 {
     public int Id { get; set; }
 

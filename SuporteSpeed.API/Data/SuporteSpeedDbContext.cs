@@ -15,7 +15,7 @@ public partial class SuporteSpeedDbContext : DbContext
     {
     }
 
-    public virtual DbSet<AiResponse> AiResponses { get; set; }
+    public virtual DbSet<Airesponse> Airesponses { get; set; }
 
     public virtual DbSet<HumanResponse> HumanResponses { get; set; }
 
@@ -23,9 +23,13 @@ public partial class SuporteSpeedDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=SuporteSpeedDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AiResponse>(entity =>
+        modelBuilder.Entity<Airesponse>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__AIRespon__3213E83FB77250D7");
 
@@ -113,12 +117,12 @@ public partial class SuporteSpeedDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(50)
                 .HasColumnName("password");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .HasColumnName("username");
             entity.Property(e => e.UserType)
                 .HasMaxLength(20)
                 .HasColumnName("user_type");
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .HasColumnName("username");
         });
 
         OnModelCreatingPartial(modelBuilder);

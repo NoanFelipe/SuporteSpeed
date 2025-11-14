@@ -63,7 +63,7 @@ namespace SuporteSpeed.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<User>> PostUser([FromForm] User user)
         {
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
