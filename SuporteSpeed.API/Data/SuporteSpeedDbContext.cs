@@ -15,7 +15,7 @@ public partial class SuporteSpeedDbContext : DbContext
     {
     }
 
-    public virtual DbSet<AiResponse> Airesponses { get; set; }
+    public virtual DbSet<AiResponse> AiResponses { get; set; }
 
     public virtual DbSet<HumanResponse> HumanResponses { get; set; }
 
@@ -113,9 +113,9 @@ public partial class SuporteSpeedDbContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(50)
                 .HasColumnName("password");
-            entity.Property(e => e.User1)
+            entity.Property(e => e.Username)
                 .HasMaxLength(50)
-                .HasColumnName("user");
+                .HasColumnName("username");
             entity.Property(e => e.UserType)
                 .HasMaxLength(20)
                 .HasColumnName("user_type");

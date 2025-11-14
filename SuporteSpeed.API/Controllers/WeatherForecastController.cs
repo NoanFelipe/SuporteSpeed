@@ -25,7 +25,6 @@ namespace SuporteSpeed.API.Controllers
             
             try
             {
-                throw new Exception("This is our logging test exception");
                 return Enumerable.Range(1, 5).Select(index => new WeatherForecast
                 {
                     Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
