@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
+using SuporteSpeed.API.DTOs.User;
 
 namespace SuporteSpeed.API.Controllers
 {
@@ -14,37 +16,47 @@ namespace SuporteSpeed.API.Controllers
     public class UsersController : Controller
     {
         private readonly SuporteSpeedDbContext _context;
+        private readonly IMapper mapper;
 
-        public UsersController(SuporteSpeedDbContext context)
+        public UsersController(SuporteSpeedDbContext context, IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
-        // GET: Users
-        [HttpGet("GetAll")]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        // GET: api/Users
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<UserReadOnlyDto>>> GetUsers()
         {
-            return Ok(await _context.Users.ToListAsync());
+            var users = await _context.Users.ToListAsync();
+            var userDtos = mapper.Map<IEnumerable<UserReadOnlyDto>>(users);
+            return Ok(userDtos);
         }
 
-        // GET: Users/Details/5
+        // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int? id)
+        public async Task<ActionResult<UserReadOnlyDto>> GetUser(int? id)
         {
             var user = await _context.Users.FindAsync(id);
 
             if (user == null)
-                return NotFound("This was reached");
+                return NotFound();
 
-            return Ok(User);
+            var userDto = mapper.Map<UserReadOnlyDto>(user);
+            return Ok(userDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<IActionResult> PutUser(int id, [FromForm] UserUpdateDto userDto)
         {
-            if (id != user.Id)
+            if (id != userDto.Id)
                 return BadRequest();
 
+            var user = await _context.Users.FindAsync(id);
+
+            if (user == null) return NotFound();
+
+            mapper.Map(userDto, user);
             _context.Entry(user).State = EntityState.Modified;
 
             try
@@ -63,8 +75,10 @@ namespace SuporteSpeed.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser([FromForm] User user)
+        public async Task<ActionResult<UserCreateDto>> PostUser([FromForm] UserCreateDto userDto)
         {
+            var user = mapper.Map<User>(userDto);
+
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 

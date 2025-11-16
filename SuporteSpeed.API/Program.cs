@@ -1,6 +1,7 @@
 using Serilog;
 using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
+using SuporteSpeed.API.Configurations;
 
 namespace SuporteSpeed.API
 {
@@ -14,7 +15,7 @@ namespace SuporteSpeed.API
             var connString = builder.Configuration.GetConnectionString("SuporteSpeedAppDbConnection");
             builder.Services.AddDbContext<SuporteSpeedDbContext>(options => options.UseSqlServer(connString));
 
-
+            builder.Services.AddAutoMapper(typeof(MapperConfig));
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
