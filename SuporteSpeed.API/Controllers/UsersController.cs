@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
 using SuporteSpeed.API.DTOs.User;
+using SuporteSpeed.API.Static;
 
 namespace SuporteSpeed.API.Controllers
 {
@@ -17,33 +18,54 @@ namespace SuporteSpeed.API.Controllers
     {
         private readonly SuporteSpeedDbContext _context;
         private readonly IMapper mapper;
+        private readonly ILogger<UsersController> logger;
 
-        public UsersController(SuporteSpeedDbContext context, IMapper mapper)
+        public UsersController(SuporteSpeedDbContext context, IMapper mapper, ILogger<UsersController> logger)
         {
             _context = context;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserReadOnlyDto>>> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
-            var userDtos = mapper.Map<IEnumerable<UserReadOnlyDto>>(users);
-            return Ok(userDtos);
+            try
+            {
+                var users = await _context.Users.ToListAsync();
+                var userDtos = mapper.Map<IEnumerable<UserReadOnlyDto>>(users);
+                return Ok(userDtos);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error Performing GET in {nameof(GetUsers)}");
+                return StatusCode(500, Messages.Error500Message);
+            }
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserReadOnlyDto>> GetUser(int? id)
         {
-            var user = await _context.Users.FindAsync(id);
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
 
-            if (user == null)
-                return NotFound();
+                if (user == null)
+                {
+                    logger.LogWarning($"Record not found: {nameof(GetUser)} - ID: {id}");
+                    return NotFound();
+                }
 
-            var userDto = mapper.Map<UserReadOnlyDto>(user);
-            return Ok(userDto);
+                var userDto = mapper.Map<UserReadOnlyDto>(user);
+                return Ok(userDto);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error Performing GET in {nameof(GetUser)}");
+                return StatusCode(500, Messages.Error500Message);
+            }
         }
 
         [HttpPut("{id}")]
@@ -77,24 +99,40 @@ namespace SuporteSpeed.API.Controllers
         [HttpPost]
         public async Task<ActionResult<UserCreateDto>> PostUser([FromForm] UserCreateDto userDto)
         {
-            var user = mapper.Map<User>(userDto);
+            try
+            {
+                var user = mapper.Map<User>(userDto);
 
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error Performing POST in {nameof(PostUser)}");
+                return StatusCode(500, Messages.Error500Message);
+            }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
+            try
+            {
+                var user = await _context.Users.FindAsync(id);
+                if (user == null) return NotFound();
 
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
+                _context.Users.Remove(user);
+                await _context.SaveChangesAsync();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error Performing DELETE in {nameof(DeleteUser)}");
+                return StatusCode(500, Messages.Error500Message);
+            }
         }
 
         private bool UserExists(int id)
