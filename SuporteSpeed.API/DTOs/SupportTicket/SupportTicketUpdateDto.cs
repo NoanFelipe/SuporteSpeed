@@ -1,14 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SuporteSpeed.API.DTOs.SupportTicket
 {
-    public class SupportTicketCreateDto
+    public class SupportTicketUpdateDto : BaseDto
     {
-        [Required]
-        [ForeignKey("User")]
-        public int UserId { get; set; }
-
         [Required]
         [StringLength(200)]
         public string Title { get; set; } = null!;

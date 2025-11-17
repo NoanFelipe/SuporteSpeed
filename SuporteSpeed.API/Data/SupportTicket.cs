@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SuporteSpeed.API.Data;
 
@@ -23,5 +25,5 @@ public partial class SupportTicket
 
     public virtual ICollection<HumanResponse> HumanResponses { get; set; } = new List<HumanResponse>();
 
-    public virtual User User { get; set; } = null!;
+    public virtual User? User { get; set; } = null!;
 }

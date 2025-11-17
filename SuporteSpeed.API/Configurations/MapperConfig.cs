@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SuporteSpeed.API.Data;
+using SuporteSpeed.API.DTOs.SupportTicket;
 using SuporteSpeed.API.DTOs.User;
 
 namespace SuporteSpeed.API.Configurations
@@ -11,6 +12,17 @@ namespace SuporteSpeed.API.Configurations
             CreateMap<UserCreateDto, User>().ReverseMap();
             CreateMap<UserUpdateDto, User>().ReverseMap();
             CreateMap<UserReadOnlyDto, User>().ReverseMap();
+
+            CreateMap<SupportTicket, SupportTicketCreateDto>().ReverseMap();
+            CreateMap<SupportTicket, SupportTicketUpdateDto>().ReverseMap();
+
+            CreateMap<SupportTicket, SupportTicketReadOnlyDto>()
+                .ForMember(q => q.Name, d => d.MapFrom(map => map.User.Name))
+                .ReverseMap();
+            CreateMap<SupportTicket, SupportTicketDetailsDto>()
+                .ForMember(q => q.Name, d => d.MapFrom(map => map.User.Name))
+                .ReverseMap();
+
         }
     }
 }
