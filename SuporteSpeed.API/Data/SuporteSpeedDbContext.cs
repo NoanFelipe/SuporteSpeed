@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SuporteSpeed.API.Data;
 
-public partial class SuporteSpeedDbContext : IdentityDbContext
+public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
 {
     public SuporteSpeedDbContext()
     {

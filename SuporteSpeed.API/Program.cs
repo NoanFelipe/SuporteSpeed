@@ -16,7 +16,7 @@ namespace SuporteSpeed.API
             var connString = builder.Configuration.GetConnectionString("SuporteSpeedAppDbConnection");
             builder.Services.AddDbContext<SuporteSpeedDbContext>(options => options.UseSqlServer(connString));
 
-            builder.Services.AddIdentityCore<IdentityUser>()
+            builder.Services.AddIdentityCore<ApiUser>()
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<SuporteSpeedDbContext>();
 
