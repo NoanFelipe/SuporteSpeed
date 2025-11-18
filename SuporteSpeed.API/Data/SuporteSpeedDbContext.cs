@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace SuporteSpeed.API.Data;
 
-public partial class SuporteSpeedDbContext : DbContext
+public partial class SuporteSpeedDbContext : IdentityDbContext
 {
     public SuporteSpeedDbContext()
     {
@@ -29,6 +30,8 @@ public partial class SuporteSpeedDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Airesponse>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__AIRespon__3213E83FB77250D7");

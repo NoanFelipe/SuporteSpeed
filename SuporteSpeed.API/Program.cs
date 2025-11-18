@@ -2,6 +2,7 @@ using Serilog;
 using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
 using SuporteSpeed.API.Configurations;
+using Microsoft.AspNetCore.Identity;
 
 namespace SuporteSpeed.API
 {
@@ -14,6 +15,10 @@ namespace SuporteSpeed.API
             // Add services to the container.
             var connString = builder.Configuration.GetConnectionString("SuporteSpeedAppDbConnection");
             builder.Services.AddDbContext<SuporteSpeedDbContext>(options => options.UseSqlServer(connString));
+
+            builder.Services.AddIdentityCore<IdentityUser>()
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<SuporteSpeedDbContext>();
 
             builder.Services.AddAutoMapper(typeof(MapperConfig));
 
