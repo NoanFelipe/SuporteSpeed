@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace SuporteSpeed.API.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedIdentityTables : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -30,6 +32,7 @@ namespace SuporteSpeed.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -48,6 +51,25 @@ namespace SuporteSpeed.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    username = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    field = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    enrollment = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    user_type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__Users__3214EC07D882AC4B", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,6 +178,112 @@ namespace SuporteSpeed.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SupportTickets",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    user_id = table.Column<int>(type: "int", nullable: false),
+                    title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    field = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    created_at = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__tmp_ms_x__3213E83F5F38289B", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_supporttickets_users",
+                        column: x => x.user_id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AIResponses",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ticket_id = table.Column<int>(type: "int", nullable: false),
+                    model_name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    confidence = table.Column<double>(type: "float", nullable: true),
+                    responded_at = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__AIRespon__3213E83FB77250D7", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_airesponses_supporttickets",
+                        column: x => x.ticket_id,
+                        principalTable: "SupportTickets",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "HumanResponses",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ticket_id = table.Column<int>(type: "int", nullable: false),
+                    support_agent_id = table.Column<int>(type: "int", nullable: false),
+                    message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    responded_at = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__HumanRes__3213E83F027E8DC2", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_humanresponses_supporttickets",
+                        column: x => x.ticket_id,
+                        principalTable: "SupportTickets",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_humanresponses_users",
+                        column: x => x.support_agent_id,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "27c859b2-13b1-49f2-a311-e153cc7d42f9", null, "User", "USER" },
+                    { "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67", null, "Administrator", "ADMINISTRATOR" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { "cfaa508f-4817-4149-9d96-18de505c1be8", 0, "STATIC-CONCURRENCY-STAMP-USER", "user@suportespeed.com", false, false, null, "System User", "USER@SUPORTESPEED.COM", "USER@SUPORTESPEED.COM", "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", null, false, "STATIC-SECURITY-STAMP-USER", false, "user@suportespeed.com" },
+                    { "d5c07402-2935-48e1-a9c1-fe50ea56c080", 0, "STATIC-CONCURRENCY-STAMP-ADMIN", "admin@suportespeed.com", false, false, null, "System Admin", "ADMIN@SUPORTESPEED.COM", "ADMIN@SUPORTESPEED.COM", "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", null, false, "STATIC-SECURITY-STAMP-ADMIN", false, "admin@suportespeed.com" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { "27c859b2-13b1-49f2-a311-e153cc7d42f9", "cfaa508f-4817-4149-9d96-18de505c1be8" },
+                    { "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67", "d5c07402-2935-48e1-a9c1-fe50ea56c080" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AIResponses_ticket_id",
+                table: "AIResponses",
+                column: "ticket_id");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -194,11 +322,29 @@ namespace SuporteSpeed.API.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HumanResponses_support_agent_id",
+                table: "HumanResponses",
+                column: "support_agent_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HumanResponses_ticket_id",
+                table: "HumanResponses",
+                column: "ticket_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportTickets_user_id",
+                table: "SupportTickets",
+                column: "user_id");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AIResponses");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -215,10 +361,19 @@ namespace SuporteSpeed.API.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "HumanResponses");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "SupportTickets");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

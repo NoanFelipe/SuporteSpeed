@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,7 +46,7 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
                 .HasMaxLength(100)
                 .HasColumnName("model_name");
             entity.Property(e => e.RespondedAt)
-                .HasDefaultValueSql("(sysdatetime())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnName("responded_at");
             entity.Property(e => e.TicketId).HasColumnName("ticket_id");
 
@@ -82,7 +83,7 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(sysdatetime())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnName("created_at");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Field)
@@ -127,6 +128,61 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
                 .HasMaxLength(50)
                 .HasColumnName("username");
         });
+
+        modelBuilder.Entity<IdentityRole>().HasData(
+            new IdentityRole
+            {
+                Name = "User",
+                NormalizedName = "USER",
+                Id = "27c859b2-13b1-49f2-a311-e153cc7d42f9"
+            },    
+            new IdentityRole
+            {
+                Name = "Administrator",
+                NormalizedName = "ADMINISTRATOR",
+                Id = "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67"
+            }
+        );
+
+        modelBuilder.Entity<ApiUser>().HasData(
+            new ApiUser
+            {
+                Id = "cfaa508f-4817-4149-9d96-18de505c1be8",
+                Email = "user@suportespeed.com",
+                NormalizedEmail = "USER@SUPORTESPEED.COM",
+                UserName = "user@suportespeed.com",
+                NormalizedUserName = "USER@SUPORTESPEED.COM",
+                Name = "System User",
+                PasswordHash = "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", //Hashed password for "P@ssword1"
+                SecurityStamp = "STATIC-SECURITY-STAMP-USER",
+                ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-USER"
+            },
+            new ApiUser
+            {
+                Id = "d5c07402-2935-48e1-a9c1-fe50ea56c080",
+                Email = "admin@suportespeed.com",
+                NormalizedEmail = "ADMIN@SUPORTESPEED.COM",
+                UserName = "admin@suportespeed.com",
+                NormalizedUserName = "ADMIN@SUPORTESPEED.COM",
+                Name = "System Admin",
+                PasswordHash = "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==",
+                SecurityStamp = "STATIC-SECURITY-STAMP-ADMIN",
+                ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ADMIN"
+            }    
+        );
+
+        modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string>
+            {
+                RoleId = "27c859b2-13b1-49f2-a311-e153cc7d42f9",
+                UserId = "cfaa508f-4817-4149-9d96-18de505c1be8"
+            },
+            new IdentityUserRole<string>
+            {
+                RoleId = "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67",
+                UserId = "d5c07402-2935-48e1-a9c1-fe50ea56c080"
+            }
+        );
 
         OnModelCreatingPartial(modelBuilder);
     }
