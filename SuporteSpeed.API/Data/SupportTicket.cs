@@ -9,7 +9,7 @@ public partial class SupportTicket
 {
     public int Id { get; set; }
 
-    public int UserId { get; set; }
+    public string UserId { get; set; }
 
     public string Title { get; set; } = null!;
 
@@ -25,5 +25,5 @@ public partial class SupportTicket
 
     public virtual ICollection<HumanResponse> HumanResponses { get; set; } = new List<HumanResponse>();
 
-    public virtual User? User { get; set; } = null!;
+    public virtual ApiUser? User { get; set; } = null!;
 }

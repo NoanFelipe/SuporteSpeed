@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SuporteSpeed.API.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialClean : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -32,7 +32,9 @@ namespace SuporteSpeed.API.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    enrollment = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    field = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -47,25 +49,6 @@ namespace SuporteSpeed.API.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    username = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    field = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    enrollment = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    user_type = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -184,7 +167,7 @@ namespace SuporteSpeed.API.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    user_id = table.Column<int>(type: "int", nullable: false),
+                    user_id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     field = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -197,7 +180,7 @@ namespace SuporteSpeed.API.Migrations
                     table.ForeignKey(
                         name: "fk_supporttickets_users",
                         column: x => x.user_id,
-                        principalTable: "Users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -232,7 +215,7 @@ namespace SuporteSpeed.API.Migrations
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ticket_id = table.Column<int>(type: "int", nullable: false),
-                    support_agent_id = table.Column<int>(type: "int", nullable: false),
+                    support_agent_id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     message = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     responded_at = table.Column<DateTime>(type: "datetime2", nullable: true, defaultValueSql: "(sysdatetime())")
                 },
@@ -248,7 +231,7 @@ namespace SuporteSpeed.API.Migrations
                     table.ForeignKey(
                         name: "fk_humanresponses_users",
                         column: x => x.support_agent_id,
-                        principalTable: "Users",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id");
                 });
 
@@ -257,17 +240,17 @@ namespace SuporteSpeed.API.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "27c859b2-13b1-49f2-a311-e153cc7d42f9", null, "User", "USER" },
-                    { "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67", null, "Administrator", "ADMINISTRATOR" }
+                    { "27c859b2-13b1-49f2-a311-e153cc7d42f9", "STATIC-CONCURRENCY-STAMP-ROLE-USER", "User", "USER" },
+                    { "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67", "STATIC-CONCURRENCY-STAMP-ROLE-ADMIN", "Administrator", "ADMINISTRATOR" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "enrollment", "field", "LockoutEnabled", "LockoutEnd", "name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { "cfaa508f-4817-4149-9d96-18de505c1be8", 0, "STATIC-CONCURRENCY-STAMP-USER", "user@suportespeed.com", false, false, null, "System User", "USER@SUPORTESPEED.COM", "USER@SUPORTESPEED.COM", "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", null, false, "STATIC-SECURITY-STAMP-USER", false, "user@suportespeed.com" },
-                    { "d5c07402-2935-48e1-a9c1-fe50ea56c080", 0, "STATIC-CONCURRENCY-STAMP-ADMIN", "admin@suportespeed.com", false, false, null, "System Admin", "ADMIN@SUPORTESPEED.COM", "ADMIN@SUPORTESPEED.COM", "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", null, false, "STATIC-SECURITY-STAMP-ADMIN", false, "admin@suportespeed.com" }
+                    { "cfaa508f-4817-4149-9d96-18de505c1be8", 0, "STATIC-CONCURRENCY-STAMP-USER", "user@suportespeed.com", false, "Tech University", "Tech", false, null, "System User", "USER@SUPORTESPEED.COM", "USER@SUPORTESPEED.COM", "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", null, false, "STATIC-SECURITY-STAMP-USER", false, "user@suportespeed.com" },
+                    { "d5c07402-2935-48e1-a9c1-fe50ea56c080", 0, "STATIC-CONCURRENCY-STAMP-ADMIN", "admin@suportespeed.com", false, "Tech University", "Tech", false, null, "System Admin", "ADMIN@SUPORTESPEED.COM", "ADMIN@SUPORTESPEED.COM", "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", null, false, "STATIC-SECURITY-STAMP-ADMIN", false, "admin@suportespeed.com" }
                 });
 
             migrationBuilder.InsertData(
@@ -367,13 +350,10 @@ namespace SuporteSpeed.API.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "SupportTickets");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "AspNetUsers");
         }
     }
 }

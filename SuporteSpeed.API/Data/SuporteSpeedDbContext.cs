@@ -23,8 +23,6 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
 
     public virtual DbSet<SupportTicket> SupportTickets { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=SuporteSpeedDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True");
@@ -102,31 +100,19 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
                 .HasConstraintName("fk_supporttickets_users");
         });
 
-        modelBuilder.Entity<User>(entity =>
+        modelBuilder.Entity<ApiUser>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC07D882AC4B");
 
-            entity.Property(e => e.Email)
+            entity.Property(e => e.Name)
                 .HasMaxLength(100)
-                .HasColumnName("email");
+                .HasColumnName("name");
             entity.Property(e => e.Enrollment)
                 .HasMaxLength(50)
                 .HasColumnName("enrollment");
             entity.Property(e => e.Field)
                 .HasMaxLength(50)
                 .HasColumnName("field");
-            entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .HasColumnName("name");
-            entity.Property(e => e.Password)
-                .HasMaxLength(50)
-                .HasColumnName("password");
-            entity.Property(e => e.UserType)
-                .HasMaxLength(20)
-                .HasColumnName("user_type");
-            entity.Property(e => e.Username)
-                .HasMaxLength(50)
-                .HasColumnName("username");
         });
 
         modelBuilder.Entity<IdentityRole>().HasData(
@@ -134,13 +120,15 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
             {
                 Name = "User",
                 NormalizedName = "USER",
-                Id = "27c859b2-13b1-49f2-a311-e153cc7d42f9"
+                Id = "27c859b2-13b1-49f2-a311-e153cc7d42f9",
+                ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ROLE-USER"
             },    
             new IdentityRole
             {
                 Name = "Administrator",
                 NormalizedName = "ADMINISTRATOR",
-                Id = "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67"
+                Id = "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67",
+                ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ROLE-ADMIN"
             }
         );
 
@@ -153,7 +141,9 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
                 UserName = "user@suportespeed.com",
                 NormalizedUserName = "USER@SUPORTESPEED.COM",
                 Name = "System User",
-                PasswordHash = "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==", //Hashed password for "P@ssword1"
+                Enrollment = "Tech University",
+                Field = "Tech",
+                PasswordHash = "AQAAAAIAAYagAAAAEENWXDp+lc3xmS1O+j+KsXlpVHbTeLZQo0/dCYx+tXwlkr9XnUFVe7Ljw6h7au0SyA==", //Hashed password for "P@ssword1"
                 SecurityStamp = "STATIC-SECURITY-STAMP-USER",
                 ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-USER"
             },
@@ -165,7 +155,9 @@ public partial class SuporteSpeedDbContext : IdentityDbContext<ApiUser>
                 UserName = "admin@suportespeed.com",
                 NormalizedUserName = "ADMIN@SUPORTESPEED.COM",
                 Name = "System Admin",
-                PasswordHash = "AQAAAAIAAYagAAAAEDrlZiaM0hQNgv7cECrM5Eyxf0XUgdG9pgGZvJObHflPXlj0xdNjUgm8hmT7jCxzQ==",
+                Enrollment = "Tech University",
+                Field = "Tech",
+                PasswordHash = "AQAAAAIAAYagAAAAEENWXDp+lc3xmS1O+j+KsXlpVHbTeLZQo0/dCYx+tXwlkr9XnUFVe7Ljw6h7au0SyA==",
                 SecurityStamp = "STATIC-SECURITY-STAMP-ADMIN",
                 ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ADMIN"
             }    

@@ -9,13 +9,13 @@ public partial class HumanResponse
 
     public int TicketId { get; set; }
 
-    public int SupportAgentId { get; set; }
+    public string SupportAgentId { get; set; }
 
     public string Message { get; set; } = null!;
 
     public DateTime? RespondedAt { get; set; }
 
-    public virtual User SupportAgent { get; set; } = null!;
+    public virtual ApiUser SupportAgent { get; set; } = null!;
 
     public virtual SupportTicket Ticket { get; set; } = null!;
 }

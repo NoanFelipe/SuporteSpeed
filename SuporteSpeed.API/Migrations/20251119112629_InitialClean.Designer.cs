@@ -12,8 +12,8 @@ using SuporteSpeed.API.Data;
 namespace SuporteSpeed.API.Migrations
 {
     [DbContext(typeof(SuporteSpeedDbContext))]
-    [Migration("20251119093109_Initial")]
-    partial class Initial
+    [Migration("20251119112629_InitialClean")]
+    partial class InitialClean
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,12 +55,14 @@ namespace SuporteSpeed.API.Migrations
                         new
                         {
                             Id = "27c859b2-13b1-49f2-a311-e153cc7d42f9",
+                            ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ROLE-USER",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = "8c3bde9d-dbd2-4f5a-91be-8b435cc72e67",
+                            ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ROLE-ADMIN",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -244,6 +246,18 @@ namespace SuporteSpeed.API.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Enrollment")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("enrollment");
+
+                    b.Property<string>("Field")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("field");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -252,7 +266,9 @@ namespace SuporteSpeed.API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("name");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -281,7 +297,8 @@ namespace SuporteSpeed.API.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("PK__Users__3214EC07D882AC4B");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -301,6 +318,8 @@ namespace SuporteSpeed.API.Migrations
                             ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-USER",
                             Email = "user@suportespeed.com",
                             EmailConfirmed = false,
+                            Enrollment = "Tech University",
+                            Field = "Tech",
                             LockoutEnabled = false,
                             Name = "System User",
                             NormalizedEmail = "USER@SUPORTESPEED.COM",
@@ -318,6 +337,8 @@ namespace SuporteSpeed.API.Migrations
                             ConcurrencyStamp = "STATIC-CONCURRENCY-STAMP-ADMIN",
                             Email = "admin@suportespeed.com",
                             EmailConfirmed = false,
+                            Enrollment = "Tech University",
+                            Field = "Tech",
                             LockoutEnabled = false,
                             Name = "System Admin",
                             NormalizedEmail = "ADMIN@SUPORTESPEED.COM",
@@ -350,8 +371,9 @@ namespace SuporteSpeed.API.Migrations
                         .HasColumnName("responded_at")
                         .HasDefaultValueSql("(sysdatetime())");
 
-                    b.Property<int>("SupportAgentId")
-                        .HasColumnType("int")
+                    b.Property<string>("SupportAgentId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnName("support_agent_id");
 
                     b.Property<int>("TicketId")
@@ -404,8 +426,9 @@ namespace SuporteSpeed.API.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasColumnName("title");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -414,62 +437,6 @@ namespace SuporteSpeed.API.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("SupportTickets");
-                });
-
-            modelBuilder.Entity("SuporteSpeed.API.Data.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("email");
-
-                    b.Property<string>("Enrollment")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("enrollment");
-
-                    b.Property<string>("Field")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("field");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("password");
-
-                    b.Property<string>("UserType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasColumnName("user_type");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasColumnName("username");
-
-                    b.HasKey("Id")
-                        .HasName("PK__Users__3214EC07D882AC4B");
-
-                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -537,7 +504,7 @@ namespace SuporteSpeed.API.Migrations
 
             modelBuilder.Entity("SuporteSpeed.API.Data.HumanResponse", b =>
                 {
-                    b.HasOne("SuporteSpeed.API.Data.User", "SupportAgent")
+                    b.HasOne("SuporteSpeed.API.Data.ApiUser", "SupportAgent")
                         .WithMany("HumanResponses")
                         .HasForeignKey("SupportAgentId")
                         .IsRequired()
@@ -557,7 +524,7 @@ namespace SuporteSpeed.API.Migrations
 
             modelBuilder.Entity("SuporteSpeed.API.Data.SupportTicket", b =>
                 {
-                    b.HasOne("SuporteSpeed.API.Data.User", "User")
+                    b.HasOne("SuporteSpeed.API.Data.ApiUser", "User")
                         .WithMany("SupportTickets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -567,18 +534,18 @@ namespace SuporteSpeed.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("SuporteSpeed.API.Data.ApiUser", b =>
+                {
+                    b.Navigation("HumanResponses");
+
+                    b.Navigation("SupportTickets");
+                });
+
             modelBuilder.Entity("SuporteSpeed.API.Data.SupportTicket", b =>
                 {
                     b.Navigation("Airesponses");
 
                     b.Navigation("HumanResponses");
-                });
-
-            modelBuilder.Entity("SuporteSpeed.API.Data.User", b =>
-                {
-                    b.Navigation("HumanResponses");
-
-                    b.Navigation("SupportTickets");
                 });
 #pragma warning restore 612, 618
         }

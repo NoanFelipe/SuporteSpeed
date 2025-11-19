@@ -9,10 +9,6 @@ namespace SuporteSpeed.API.Configurations
     {
         public MapperConfig() 
         {
-            CreateMap<UserCreateDto, User>().ReverseMap();
-            CreateMap<UserUpdateDto, User>().ReverseMap();
-            CreateMap<UserReadOnlyDto, User>().ReverseMap();
-
             CreateMap<SupportTicket, SupportTicketCreateDto>().ReverseMap();
             CreateMap<SupportTicket, SupportTicketUpdateDto>().ReverseMap();
 
@@ -23,6 +19,7 @@ namespace SuporteSpeed.API.Configurations
                 .ForMember(q => q.Name, d => d.MapFrom(map => map.User.Name))
                 .ReverseMap();
 
+            CreateMap<ApiUser, UserDto>().ReverseMap();
         }
     }
 }
