@@ -2,9 +2,14 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using SuporteSpeed.API.Data;
 using SuporteSpeed.API.DTOs.User;
+using SuporteSpeed.API.Static;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace SuporteSpeed.API.Controllers
 {
@@ -15,12 +20,14 @@ namespace SuporteSpeed.API.Controllers
         private readonly ILogger<AuthController> logger;
         private readonly IMapper mapper;
         private readonly UserManager<ApiUser> userManager;
+        private readonly IConfiguration configuration;
 
-        public AuthController(ILogger<AuthController> logger, IMapper mapper, UserManager<ApiUser> userManager)
+        public AuthController(ILogger<AuthController> logger, IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration)
         {
             this.logger = logger;
             this.mapper = mapper;
             this.userManager = userManager;
+            this.configuration = configuration;
         }
 
         [HttpPost]
@@ -55,7 +62,7 @@ namespace SuporteSpeed.API.Controllers
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromForm] LoginUserDto userDto)
+        public async Task<ActionResult<AuthResponse>> Login([FromForm] LoginUserDto userDto)
         {
             /* Used to generate valid PasswordHash static value
             logger.LogInformation("Beginning auth test for hash password!");
@@ -71,15 +78,55 @@ namespace SuporteSpeed.API.Controllers
                 var passwordValid = await userManager.CheckPasswordAsync(user, userDto.Password);
 
                 if (user == null || passwordValid == false)
-                    return NotFound();
+                    return Unauthorized(userDto);
 
-                return Accepted();
+                string tokenString = await GenerateToken(user);
+
+                var response = new AuthResponse
+                {
+                    UserName = userDto.UserName,
+                    Token = tokenString,
+                    UserId = user.Id,
+                };
+
+                return Ok(response);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, $"Something Went Wrong in the {nameof(Login)}");
                 return Problem(ex.Message, statusCode: 500);
             }
+        }
+
+        private async Task<string> GenerateToken(ApiUser user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var roles = await userManager.GetRolesAsync(user);
+            var roleClaims = roles.Select(q => new Claim(ClaimTypes.Role, q)).ToList();
+
+            var userClaims = await userManager.GetClaimsAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(CustomClaimTypes.Uid, user.Id),
+            }
+            .Union(userClaims)
+            .Union(roleClaims);
+
+            var token = new JwtSecurityToken(
+                issuer: configuration["JwtSettings:Issuer"],
+                audience: configuration["JwtSettings:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(Convert.ToInt32(configuration["JwtSettings:Duration"])),
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }
