@@ -25,7 +25,7 @@ namespace SuporteSpeed.API.Controllers
 
         [HttpPost]
         [Route("register")]
-        public async Task<IActionResult> Register([FromBody] UserDto userDto)
+        public async Task<IActionResult> Register([FromForm] UserDto userDto)
         {
             logger.LogInformation($"Registration Attempt for {userDto.UserName}");
             try

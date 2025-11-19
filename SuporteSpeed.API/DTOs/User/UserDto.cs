@@ -13,5 +13,11 @@ namespace SuporteSpeed.API.DTOs.User
 
         [Required]
         public string Role { get; set; }
+
+        [Required]
+        public string Enrollment { get; set; }
+
+        [Required]
+        public string Field { get; set; }
     }
 }
