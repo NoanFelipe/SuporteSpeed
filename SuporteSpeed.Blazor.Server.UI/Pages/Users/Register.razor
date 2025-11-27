@@ -1,0 +1,86 @@
+﻿@page "/users/register"
+@inject IClient httpClient
+@inject NavigationManager navManager
+
+<h3>CADASTRO DE USUÁRIO</h3>
+
+@if(!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-danger">
+        <p>@message</p>
+    </div>
+}
+<div>
+    <EditForm Model="RegistrationModel" OnValidSubmit="HandleRegistration">
+        <DataAnnotationsValidator></DataAnnotationsValidator>
+        <ValidationSummary></ValidationSummary>
+        <div class="form-group">
+            <label for="Name">Nome completo</label>
+            <InputText class="form-control" @bind-Value="RegistrationModel.Name"/>
+            <ValidationMessage For="@(() => RegistrationModel.Name)"/>
+        </div>
+        <br/>
+        <div class="form-group">
+            <label for="Email Address">E-mail</label>
+            <InputText class="form-control" @bind-Value="RegistrationModel.Email"/>
+            <ValidationMessage For="@(() => RegistrationModel.Email)"/>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="User Name">Usuário</label>
+            <InputText class="form-control" @bind-Value="RegistrationModel.UserName"/>
+            <ValidationMessage For="@(() => RegistrationModel.UserName)"/>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="Field">Setor</label>
+            <InputText class="form-control" @bind-Value="RegistrationModel.Field"/>
+            <ValidationMessage For="@(() => RegistrationModel.Field)"/>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="Enrollment">Matrícula do Funcionário</label>
+            <InputText class="form-control" @bind-Value="RegistrationModel.Enrollment"/>
+            <ValidationMessage For="@(() => RegistrationModel.Enrollment)"/>
+        </div>
+        <br />
+        <div class="form-group">
+            <label for="Password">Senha</label>
+            <InputText class="form-control" type="password" @bind-Value="RegistrationModel.Password"/>
+            <ValidationMessage For="@(() => RegistrationModel.Password)"/>
+        </div>
+        <br />
+
+        <button type="submit" class="btn btn-primary btn-success">CADASTRAR</button>
+
+    </EditForm>
+</div>
+
+@code {
+    UserDto RegistrationModel = new UserDto
+    {
+        Role = "User"
+    };
+    string message = string.Empty;
+
+    private async Task HandleRegistration()
+    {
+        try
+        {
+            await httpClient.RegisterAsync(RegistrationModel);
+            NavigateToLogin();
+        } 
+        catch (ApiException ex)
+        {
+            if (ex.StatusCode >= 200 && ex.StatusCode <= 299)
+                NavigateToLogin();    
+
+            message = ex.Response;
+        }
+    }
+
+    private void NavigateToLogin()
+    {
+        navManager.NavigateTo("/users/login");
+    }
+}

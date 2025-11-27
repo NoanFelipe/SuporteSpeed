@@ -1,0 +1,49 @@
+﻿@page "/users/login"
+@inject IAuthenticationService authService
+
+
+<EditForm Model="LoginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <div class="form-group">
+        <label for="User Name">Usuário</label>
+        <InputText class="form-control" @bind-Value="LoginModel.UserName" />
+        <ValidationMessage For="@(() => LoginModel.UserName)" />
+    </div>
+    <br/>
+    <div class="form-group">
+        <label for="Password">Senha</label>
+        <InputText class="form-control" type="password" @bind-Value="LoginModel.Password" />
+        <ValidationMessage For="@(() => LoginModel.Password)" />
+    </div>
+    <br />
+
+    <button type="submit" class="btn btn-primary btn-success">CADASTRAR</button>
+
+</EditForm>
+
+@code {
+    UserLoginDto LoginModel = new();
+    string message = String.Empty;
+
+    public async Task HandleLogin()
+    {
+        try
+        {
+            var response = await authService.AuthenticateAsync(LoginModel);
+
+            if (response)
+            {
+
+            }
+            message = "Login inválido";
+        }
+        catch (ApiException ex)
+        {
+            if (ex.StatusCode >= 200 && ex.StatusCode <= 299)
+                
+
+            message = ex.Response;
+        }
+    }
+}

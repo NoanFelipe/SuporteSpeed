@@ -1,6 +1,5 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using SuporteSpeed.Blazor.Server.UI.Data;
+using Blazored.LocalStorage;
+using SuporteSpeed.Blazor.Server.UI.Services.Authentication;
 using SuporteSpeed.Blazor.Server.UI.Services.Base;
 
 namespace SuporteSpeed.Blazor.Server.UI
@@ -14,8 +13,9 @@ namespace SuporteSpeed.Blazor.Server.UI
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
-            builder.Services.AddSingleton<WeatherForecastService>();
+            builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddHttpClient<IClient, Client>(cl => cl.BaseAddress = new Uri("https://localhost:7180"));
+            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             var app = builder.Build();
 
