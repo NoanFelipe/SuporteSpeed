@@ -1,4 +1,6 @@
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using SuporteSpeed.Blazor.Server.UI.Providers;
 using SuporteSpeed.Blazor.Server.UI.Services.Authentication;
 using SuporteSpeed.Blazor.Server.UI.Services.Base;
 
@@ -16,6 +18,9 @@ namespace SuporteSpeed.Blazor.Server.UI
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddHttpClient<IClient, Client>(cl => cl.BaseAddress = new Uri("https://localhost:7180"));
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            builder.Services.AddScoped<ApiAuthenticationStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(p => 
+                p.GetRequiredService<ApiAuthenticationStateProvider>());
 
             var app = builder.Build();
 

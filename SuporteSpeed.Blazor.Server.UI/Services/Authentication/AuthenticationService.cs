@@ -1,4 +1,6 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using SuporteSpeed.Blazor.Server.UI.Providers;
 using SuporteSpeed.Blazor.Server.UI.Services.Base;
 
 namespace SuporteSpeed.Blazor.Server.UI.Services.Authentication
@@ -7,11 +9,13 @@ namespace SuporteSpeed.Blazor.Server.UI.Services.Authentication
     {
         private readonly IClient httpClient;
         private readonly ILocalStorageService localStorage;
+        private readonly AuthenticationStateProvider authenticationStateProvider;
 
-        public AuthenticationService(IClient httpClient, ILocalStorageService localStorage)
+        public AuthenticationService(IClient httpClient, ILocalStorageService localStorage, AuthenticationStateProvider authenticationStateProvider)
         {
             this.httpClient = httpClient;
             this.localStorage = localStorage;
+            this.authenticationStateProvider = authenticationStateProvider;
         }
 
         public async Task<bool> AuthenticateAsync(UserLoginDto loginModel)
@@ -22,8 +26,14 @@ namespace SuporteSpeed.Blazor.Server.UI.Services.Authentication
             await localStorage.SetItemAsync("accessToken", response.Token);
 
             //Change auth state of app
+            await ((ApiAuthenticationStateProvider)authenticationStateProvider).LoggenIn();
 
             return true;
+        }
+
+        public async Task Logout()
+        {
+            await((ApiAuthenticationStateProvider)authenticationStateProvider).LoggedOut();
         }
     }
 }

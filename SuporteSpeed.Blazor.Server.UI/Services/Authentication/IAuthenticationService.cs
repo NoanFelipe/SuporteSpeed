@@ -4,6 +4,8 @@ namespace SuporteSpeed.Blazor.Server.UI.Services.Authentication
 {
     public interface IAuthenticationService
     {
-        Task<bool> AuthenticateAsync(UserLoginDto);
+        Task<bool> AuthenticateAsync(UserLoginDto loginDto);
+
+        public Task Logout();
     }
 }

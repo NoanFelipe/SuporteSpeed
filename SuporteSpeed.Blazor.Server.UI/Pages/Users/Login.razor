@@ -1,6 +1,6 @@
 ﻿@page "/users/login"
 @inject IAuthenticationService authService
-
+@inject NavigationManager navManager
 
 <EditForm Model="LoginModel" OnValidSubmit="HandleLogin">
     <DataAnnotationsValidator></DataAnnotationsValidator>
@@ -18,12 +18,12 @@
     </div>
     <br />
 
-    <button type="submit" class="btn btn-primary btn-success">CADASTRAR</button>
+    <button type="submit" class="btn btn-primary btn-success">LOGIN</button>
 
 </EditForm>
 
 @code {
-    UserLoginDto LoginModel = new();
+    UserLoginDto LoginModel = new UserLoginDto();
     string message = String.Empty;
 
     public async Task HandleLogin()
@@ -34,7 +34,7 @@
 
             if (response)
             {
-
+                navManager.NavigateTo("/");
             }
             message = "Login inválido";
         }
