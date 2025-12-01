@@ -1,0 +1,57 @@
+﻿@page "/tickets/"
+@inject ITicketService ticketService
+
+<h3>Central de Ajuda</h3>
+
+@if (response.Success == false)
+{
+    <div class="alert alert-danger">
+        <h4>@response.Message</h4>
+    </div>
+}
+@if(Tickets == null)
+{
+    <div class="alert alert-info">
+        <h4>Carregando informações...</h4>
+    </div>
+}
+else
+{
+    <a class="btn btn-dark" href="/tickets/create"><span class="oi oi-plus" aria-hidden="true"></span> Create</a>
+    <br />
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Setor</th>
+                <th>Status</th>
+                <th>Descrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var ticket in Tickets)
+            {
+                <tr>
+                    <td>@ticket.Title</td>
+                    <td>@ticket.Field</td>
+                    <td>@ticket.Status</td>
+                    <td>@ticket.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<SupportTicketReadOnlyDto> Tickets;
+    private Response<List<SupportTicketReadOnlyDto>> response = new() { Success = true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        response = await ticketService.GetTickets();
+        if (response.Success)
+        {
+            Tickets = response.Data;
+        }
+    }
+}

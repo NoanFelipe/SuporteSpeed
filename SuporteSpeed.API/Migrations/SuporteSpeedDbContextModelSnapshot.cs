@@ -384,7 +384,7 @@ namespace SuporteSpeed.API.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("HumanResponses");
+                    b.ToTable("HumanResponses", (string)null);
                 });
 
             modelBuilder.Entity("SuporteSpeed.API.Data.SupportTicket", b =>
@@ -433,7 +433,7 @@ namespace SuporteSpeed.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("SupportTickets");
+                    b.ToTable("SupportTickets", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
