@@ -38,8 +38,14 @@ namespace SuporteSpeed.API.Controllers
                 return Unauthorized();
             }
 
-            var supportTickets = await _context.SupportTickets
-                .Where(t => t.UserId == userId)
+            var query = _context.SupportTickets.AsQueryable();
+
+            if (!User.IsInRole("Administrator"))
+            {
+                query = query.Where(t => t.UserId == userId);
+            }
+
+            var supportTickets = await query
                 .Include(q => q.User)
                 .ProjectTo<SupportTicketReadOnlyDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
@@ -58,8 +64,14 @@ namespace SuporteSpeed.API.Controllers
                 return Unauthorized();
             }
 
-            var supportTicket = await _context.SupportTickets
-                .Where(t => t.UserId == userId)
+            var query = _context.SupportTickets.AsQueryable();
+
+            if (!User.IsInRole("Administrator"))
+            {
+                query = query.Where(t => t.UserId == userId);
+            }
+
+            var supportTicket = await query
                 .Include(q => q.User)
                 .ProjectTo<SupportTicketDetailsDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(q => q.Id == id);
@@ -162,10 +174,16 @@ namespace SuporteSpeed.API.Controllers
                 return Unauthorized();
             }
 
+            var query = _context.SupportTickets.AsQueryable();
+
+            if (!User.IsInRole("Administrator"))
+            {
+                query = query.Where(t => t.UserId == userId);
+            }
+
             const string ErrorSignature = "Erro ao comunicar com a IA:";
 
-            var ticketsFromDb = await _context.SupportTickets
-                .Where(t => t.UserId == userId)
+            var ticketsFromDb = await query
                 .Include(t => t.Airesponses)
                 .ToListAsync();
 
