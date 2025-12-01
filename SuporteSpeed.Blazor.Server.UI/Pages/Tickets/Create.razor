@@ -1,6 +1,7 @@
 ﻿@page "/tickets/create/"
 @inject ITicketService ticketService
 @inject NavigationManager navManager
+@inject AuthenticationStateProvider authState
 
 <h3>Adicionar Chamado</h3>
 <EditForm Model="Ticket" OnValidSubmit="HandleCreateTicket">
@@ -38,7 +39,7 @@
 </EditForm>
 
 @code {
-    private TicketCreateDto Ticket = new();
+    private SupportTicketCreateDto Ticket = new();
 
     private async Task HandleCreateTicket()
     {

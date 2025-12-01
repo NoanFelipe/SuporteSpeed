@@ -5,8 +5,7 @@ namespace SuporteSpeed.API.DTOs.SupportTicket
 {
     public class SupportTicketCreateDto
     {
-        [Required]
-        public string UserId { get; set; } = null!;
+        public string? UserId { get; set; }
 
         [Required]
         [StringLength(200)]

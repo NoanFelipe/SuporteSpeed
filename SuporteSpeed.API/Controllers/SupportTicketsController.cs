@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
 using SuporteSpeed.API.DTOs.SupportTicket;
+using System.Security.Claims;
 
 namespace SuporteSpeed.API.Controllers
 {
@@ -88,8 +90,17 @@ namespace SuporteSpeed.API.Controllers
         // POST: api/SupportTickets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<SupportTicketCreateDto>> PostSupportTicket([FromBody] SupportTicketCreateDto supportTicketDto)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            supportTicketDto.UserId = userId;
+
+            if (userId == null)
+            {
+                return BadRequest("UserId from token is NULL — the user is not authenticated or token missing NameIdentifier claim.");
+            }
+
             var supportTicket = mapper.Map<SupportTicket>(supportTicketDto);
             _context.SupportTickets.Add(supportTicket);
             await _context.SaveChangesAsync();

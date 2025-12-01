@@ -18,7 +18,7 @@ namespace SuporteSpeed.Blazor.Server.UI.Services.Authentication
             this.authenticationStateProvider = authenticationStateProvider;
         }
 
-        public async Task<bool> AuthenticateAsync(UserLoginDto loginModel)
+        public async Task<bool> AuthenticateAsync(Body2 loginModel)
         {
             var response = await httpClient.LoginAsync(loginModel);
 
