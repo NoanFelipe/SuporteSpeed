@@ -1,0 +1,118 @@
+﻿@page "/ai-review"
+@using SuporteSpeed.Blazor.Server.UI.DTOs.SupportTicket
+@using System.Net.Http.Json
+@inject IHttpClientFactory HttpClientFactory
+@inject ILogger<AiReview> Logger
+
+<PageTitle>Respostas da IA</PageTitle>
+
+<div class="container mt-4">
+    <h2>🤖 Respostas Automatizadas (Gemini)</h2>
+    <p class="text-muted">Análise e sugestões de resposta para seus chamados.</p>
+
+    <AuthorizeView>
+        <Authorized>
+            @if (tickets == null)
+            {
+                <div class="alert alert-info" role="alert">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Carregando seus tickets e gerando respostas da IA...
+                </div>
+            }
+            else if (errorMessage != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    ❌ Erro ao carregar dados: @errorMessage
+                </div>
+            }
+            else if (!tickets.Any())
+            {
+                <div class="alert alert-warning" role="alert">
+                    Você não possui tickets de suporte abertos ou registrados no momento.
+                </div>
+            }
+            else
+            {
+                @foreach (var ticket in tickets)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">#@ticket.TicketId - @ticket.Title</h5>
+                            <small>Setor: **@ticket.Category** | Última Resposta em: @(ticket.LastResponseDate?.ToString("dd/MM/yyyy HH:mm"))</small>
+                        </div>
+                        <div class="card-body">
+                            <h6>Descrição Original:</h6>
+                            <p class="text-muted small">@ticket.Description</p>
+
+                            <hr />
+
+                            <h6>✨ Resposta da IA (Gemini):</h6>
+                            <div class="ai-response-box p-3 border rounded bg-light">
+                                @((MarkupString)FormatResponse(ticket.AiResponse))
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4" />
+                }
+            }
+        </Authorized>
+        <NotAuthorized>
+            <div class="alert alert-warning">
+                Você precisa estar logado para visualizar as respostas da IA.
+            </div>
+        </NotAuthorized>
+        <Authorizing>
+            <div class="alert alert-info">Verificando autenticação...</div>
+        </Authorizing>
+    </AuthorizeView>
+</div>
+
+
+@code {
+    private List<SupportTicketAiViewDto>? tickets;
+    private string? errorMessage;
+    private bool firstRender = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && this.firstRender)
+        {
+            this.firstRender = false;
+            await LoadTicketsWithAi();
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadTicketsWithAi()
+    {
+        using var Http = HttpClientFactory.CreateClient("SuporteApi");
+
+        try
+        {
+            var url = "api/SupportTickets/ai-view";
+            tickets = await Http.GetFromJsonAsync<List<SupportTicketAiViewDto>>(url);
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                errorMessage = "Sessão expirada. Por favor, faça login novamente.";
+            }
+            else
+            {
+                errorMessage = $"Erro de Requisição HTTP: {httpEx.Message}. Status: {(httpEx.StatusCode.HasValue ? httpEx.StatusCode.ToString() : "N/A")}";
+            }
+            Logger.LogError(httpEx, "Erro ao buscar tickets com AI.");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erro inesperado: {ex.Message}";
+            Logger.LogError(ex, "Erro geral ao carregar a página.");
+        }
+    }
+
+    private string FormatResponse(string response)
+    {
+        return response.Replace("\n", "<br/>");
+    }
+}

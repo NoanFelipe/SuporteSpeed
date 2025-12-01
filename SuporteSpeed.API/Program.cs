@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SuporteSpeed.API.Services.AI;
 
 namespace SuporteSpeed.API
 {
@@ -41,6 +42,19 @@ namespace SuporteSpeed.API
                 .AllowAnyOrigin());
             });
 
+            /*
+            var jwtKey = builder.Configuration["JwtSettings:Key"]; 
+            var jwtIssuer = builder.Configuration["JwtSettings:Issuer"];
+            var jwtAudience = builder.Configuration["JwtSettings:Audience"];
+
+            Console.WriteLine($"Key: {jwtKey}");
+            Console.WriteLine($"Issuer: {jwtIssuer}");
+            Console.WriteLine($"Audience: {jwtAudience}");
+            */
+
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,15 +64,18 @@ namespace SuporteSpeed.API
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
-                    ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-                    ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
+
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidAudience = jwtSettings["Audience"],
+                    IssuerSigningKey = signingKey
                 };
             });
+
+            builder.Services.AddHttpClient<IGeminiService, GeminiService>();
 
             var app = builder.Build();
 

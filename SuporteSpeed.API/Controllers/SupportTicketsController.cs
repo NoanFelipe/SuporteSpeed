@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
 using SuporteSpeed.API.DTOs.SupportTicket;
+using SuporteSpeed.API.Services.AI;
 using System.Security.Claims;
 
 namespace SuporteSpeed.API.Controllers
@@ -15,11 +16,13 @@ namespace SuporteSpeed.API.Controllers
     {
         private readonly SuporteSpeedDbContext _context;
         private readonly IMapper mapper;
+        private readonly IGeminiService _geminiService;
 
-        public SupportTicketsController(SuporteSpeedDbContext context, IMapper mapper)
+        public SupportTicketsController(SuporteSpeedDbContext context, IMapper mapper, IGeminiService geminiService)
         {
             _context = context;
             this.mapper = mapper;
+            this._geminiService = geminiService;
         }
 
         // GET: api/SupportTickets
@@ -127,6 +130,70 @@ namespace SuporteSpeed.API.Controllers
         private bool SupportTicketExists(int id)
         {
             return _context.SupportTickets.Any(e => e.Id == id);
+        }
+
+        [HttpGet("ai-view")]
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<SupportTicketAiViewDto>>> GetTicketsWithAi()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var tickets = await _context.SupportTickets
+                .Include(t => t.Airesponses)
+                .Where(t => t.UserId == userId)
+                .OrderByDescending(t => t.CreatedAt) 
+                .ToListAsync();
+
+            var resultList = new List<SupportTicketAiViewDto>();
+
+            foreach (var ticket in tickets)
+            {
+                string responseText;
+                DateTime? responseDate;
+
+                var existingAiResponse = ticket.Airesponses.FirstOrDefault();
+
+                if (existingAiResponse != null)
+                {
+                    responseText = existingAiResponse.Message;
+                    responseDate = existingAiResponse.RespondedAt;
+                }
+                else
+                {
+                    responseText = await _geminiService.GenerateTicketResponseAsync(
+                        ticket.Title,
+                        ticket.Field,
+                        ticket.Description ?? "Sem descrição detalhada."
+                    );
+
+                    responseDate = DateTime.Now;
+
+                    var newAiResponse = new Airesponse
+                    {
+                        TicketId = ticket.Id,
+                        Message = responseText,
+                        ModelName = "gemini-1.5-flash",
+                        RespondedAt = responseDate,
+                        Confidence = 1.0 
+                    };
+
+                    _context.Airesponses.Add(newAiResponse);
+                    await _context.SaveChangesAsync();
+                }
+
+                resultList.Add(new SupportTicketAiViewDto
+                {
+                    TicketId = ticket.Id,
+                    Title = ticket.Title,
+                    Category = ticket.Field,
+                    Description = ticket.Description,
+                    AiResponse = responseText,
+                    LastResponseDate = responseDate
+                });
+            }
+
+            return Ok(resultList);
         }
     }
 }
