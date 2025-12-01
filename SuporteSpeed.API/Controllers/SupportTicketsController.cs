@@ -132,68 +132,69 @@ namespace SuporteSpeed.API.Controllers
             return _context.SupportTickets.Any(e => e.Id == id);
         }
 
-        [HttpGet("ai-view")]
+        [HttpGet]
+        [Route("ai-view")]
         [Authorize]
         public async Task<ActionResult<IEnumerable<SupportTicketAiViewDto>>> GetTicketsWithAi()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
+            const string ErrorSignature = "Erro ao comunicar com a IA:";
 
-            var tickets = await _context.SupportTickets
+            var ticketsFromDb = await _context.SupportTickets
                 .Include(t => t.Airesponses)
-                .Where(t => t.UserId == userId)
-                .OrderByDescending(t => t.CreatedAt) 
                 .ToListAsync();
 
-            var resultList = new List<SupportTicketAiViewDto>();
+            var results = new List<SupportTicketAiViewDto>();
+            bool changesMade = false;
 
-            foreach (var ticket in tickets)
+            foreach (var ticket in ticketsFromDb)
             {
-                string responseText;
-                DateTime? responseDate;
+                var lastAiResponseEntity = ticket.Airesponses
+                    .OrderByDescending(a => a.RespondedAt)
+                    .FirstOrDefault();
 
-                var existingAiResponse = ticket.Airesponses.FirstOrDefault();
+                string aiResponseText = lastAiResponseEntity?.Message;
 
-                if (existingAiResponse != null)
+                if (string.IsNullOrEmpty(aiResponseText) || aiResponseText.StartsWith(ErrorSignature))
                 {
-                    responseText = existingAiResponse.Message;
-                    responseDate = existingAiResponse.RespondedAt;
-                }
-                else
-                {
-                    responseText = await _geminiService.GenerateTicketResponseAsync(
+                    string newResponseText = await _geminiService.GenerateTicketResponseAsync(
                         ticket.Title,
                         ticket.Field,
-                        ticket.Description ?? "Sem descrição detalhada."
+                        ticket.Description
                     );
 
-                    responseDate = DateTime.Now;
-
-                    var newAiResponse = new Airesponse
+                    var newAiResponseEntity = new Airesponse
                     {
                         TicketId = ticket.Id,
-                        Message = responseText,
-                        ModelName = "gemini-2.5-flash",
-                        RespondedAt = responseDate,
-                        Confidence = 1.0 
+                        ModelName = "gemini-2.0-flash",
+                        Message = newResponseText,
+                        RespondedAt = DateTime.UtcNow
                     };
 
-                    _context.Airesponses.Add(newAiResponse);
-                    await _context.SaveChangesAsync();
+                    ticket.Airesponses.Add(newAiResponseEntity);
+
+                    aiResponseText = newResponseText;
+                    changesMade = true;
                 }
 
-                resultList.Add(new SupportTicketAiViewDto
+                var dto = new SupportTicketAiViewDto
                 {
                     TicketId = ticket.Id,
                     Title = ticket.Title,
+                    Description = ticket.Description ?? string.Empty,
                     Category = ticket.Field,
-                    Description = ticket.Description,
-                    AiResponse = responseText,
-                    LastResponseDate = responseDate
-                });
+                    AiResponse = aiResponseText,
+                    LastResponseDate = lastAiResponseEntity?.RespondedAt
+                };
+
+                results.Add(dto);
             }
 
-            return Ok(resultList);
+            if (changesMade)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(results);
         }
     }
 }

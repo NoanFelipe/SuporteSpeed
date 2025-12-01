@@ -23,12 +23,15 @@ namespace SuporteSpeed.API.Services.AI
         public async Task<string> GenerateTicketResponseAsync(string title, string field, string description)
         {
             var prompt = $"Você é um agente de suporte técnico experiente da empresa SuporteSpeed. " +
-                         $"Por favor, responda ao seguinte chamado de forma cordial, técnica e resolutiva.\n\n" +
-                         $"Dados do Chamado:\n" +
-                         $"- Título: {title}\n" +
-                         $"- Setor (Field): {field}\n" +
-                         $"- Descrição dada pelo Usuário: {description}\n\n" +
-                         $"Gere apenas a resposta que deve ser enviada ao usuário. A resposta deve ser curta e direto ao ponto.";
+             $"Sua tarefa é gerar APENAS o texto de uma resposta técnica e resolutiva para o problema abaixo. " +
+             $"O texto deve ser direto, profissional e conter uma solução ou os próximos passos para resolver o problema. " +
+             $"Você NÃO deve incluir o cabeçalho, saudação, despedida ou assinatura do e-mail. " +
+             $"Gere APENAS o conteúdo principal da mensagem de suporte (o corpo da solução).\n\n" +
+             $"Dados do Chamado:\n" +
+             $"- Título: {title}\n" +
+             $"- Setor (Field): {field}\n" +
+             $"- Descrição dada pelo Usuário: {description}\n\n" +
+             $"O texto de mensagem de suporte deve ser curto e direto ao ponto, ao mesmo tempo que resolve o problema.";
 
             var requestBody = new GeminiRequest
             {
