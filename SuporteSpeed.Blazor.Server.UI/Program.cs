@@ -18,18 +18,14 @@ namespace SuporteSpeed.Blazor.Server.UI
             builder.Services.AddServerSideBlazor();
             builder.Services.AddBlazoredLocalStorage();
 
-            builder.Services.AddScoped<ITokenAccessor, TokenAccessor>();
-            builder.Services.AddScoped<AuthorizationDelegatingHandler>();
             builder.Services.AddHttpClient<IClient, Client>(cl => cl.BaseAddress = new Uri("https://localhost:7180")); // Client is the service representing the API part of the app
             builder.Services.AddHttpClient("SuporteApi", client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7180/");
-            })
-            .AddHttpMessageHandler<AuthorizationDelegatingHandler>();
+            });
 
             builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddScoped<ILogger, Logger<ITokenAccessor>>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
 

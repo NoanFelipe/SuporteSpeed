@@ -7,7 +7,7 @@ namespace SuporteSpeed.API.Services.AI
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
-        private const string ModelId = "gemini-1.5-flash";
+        private const string ModelId = "gemini-2.0-flash";
 
         public GeminiService(HttpClient httpClient, IConfiguration configuration)
         {

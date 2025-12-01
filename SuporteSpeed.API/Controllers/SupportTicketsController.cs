@@ -173,7 +173,7 @@ namespace SuporteSpeed.API.Controllers
                     {
                         TicketId = ticket.Id,
                         Message = responseText,
-                        ModelName = "gemini-1.5-flash",
+                        ModelName = "gemini-2.5-flash",
                         RespondedAt = responseDate,
                         Confidence = 1.0 
                     };

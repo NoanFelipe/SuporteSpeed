@@ -1,14 +1,17 @@
 ﻿@page "/ai-review"
+@using Blazored.LocalStorage
 @using SuporteSpeed.Blazor.Server.UI.DTOs.SupportTicket
 @using System.Net.Http.Json
 @inject IHttpClientFactory HttpClientFactory
 @inject ILogger<AiReview> Logger
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILocalStorageService LocalStorage
 
 <PageTitle>Respostas da IA</PageTitle>
 
 <div class="container mt-4">
     <h2>🤖 Respostas Automatizadas (Gemini)</h2>
-    <p class="text-muted">Análise e sugestões de resposta para seus chamados.</p>
+    <p class="text-muted">Análise e respostas para seus chamados, feitos pelo Gemini.</p>
 
     <AuthorizeView>
         <Authorized>
@@ -37,8 +40,8 @@
                 {
                     <div class="card mb-3 shadow-sm">
                         <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">#@ticket.TicketId - @ticket.Title</h5>
-                            <small>Setor: **@ticket.Category** | Última Resposta em: @(ticket.LastResponseDate?.ToString("dd/MM/yyyy HH:mm"))</small>
+                            <h5 class="mb-0">@ticket.Title</h5>
+                            <small>Setor: @ticket.Category | Última Resposta em: @(ticket.LastResponseDate?.ToString("dd/MM/yyyy HH:mm"))</small>
                         </div>
                         <div class="card-body">
                             <h6>Descrição Original:</h6>
@@ -86,6 +89,21 @@
     private async Task LoadTicketsWithAi()
     {
         using var Http = HttpClientFactory.CreateClient("SuporteApi");
+
+        string token = null;
+        try
+        {
+            token = await LocalStorage.GetItemAsync<string>("accessToken");
+        }
+        catch (InvalidOperationException)
+        {
+
+        }
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        }
 
         try
         {
