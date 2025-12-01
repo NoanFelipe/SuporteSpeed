@@ -1,0 +1,56 @@
+﻿@page "/tickets/create/"
+@inject ITicketService ticketService
+@inject NavigationManager navManager
+
+<h3>Adicionar Chamado</h3>
+<EditForm Model="Ticket" OnValidSubmit="HandleCreateTicket">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <div class="form-group">
+        <label for="title">Título</label>
+        <InputText class="form-control" @bind-Value="Ticket.Title" id="title" />
+        <ValidationMessage For="@(() => Ticket.Title)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="description">Descrição</label>
+        <InputTextArea class="form-control" @bind-Value="Ticket.Description" id="description" />
+        <ValidationMessage For="@(() => Ticket.Description)" />
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="field">Setor</label>
+        <InputText class="form-control" @bind-Value="Ticket.Field" id="field" />
+        <ValidationMessage For="@(() => Ticket.Field)" />
+    </div>
+    <br />
+
+    <button type="submit" class="btn btn-primary btn-success">
+        <span class="oi oi-pencil"></span>
+        ENVIAR CHAMADO
+    </button>
+
+    <button @onclick="BackToList" class="btn btn-outline-secondary">
+        <span class="oi oi-media-skip-backward"></span>
+        VOLTAR PRA LISTA
+    </button>
+</EditForm>
+
+@code {
+    private TicketCreateDto Ticket = new();
+
+    private async Task HandleCreateTicket()
+    {
+        var response = await ticketService.CreateTicket(Ticket);
+        if (response.Success)
+        {
+            BackToList();
+        }
+    }
+
+    private void BackToList()
+    {
+        navManager.NavigateTo("/tickets/");
+    }
+}

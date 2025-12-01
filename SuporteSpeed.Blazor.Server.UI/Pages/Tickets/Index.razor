@@ -9,15 +9,16 @@
         <h4>@response.Message</h4>
     </div>
 }
-@if(Tickets == null)
-{
-    <div class="alert alert-info">
-        <h4>Carregando informações...</h4>
-    </div>
-}
 else
 {
-    <a class="btn btn-dark" href="/tickets/create"><span class="oi oi-plus" aria-hidden="true"></span> Create</a>
+    @if(Tickets == null)
+    {
+        <div class="alert alert-info">
+            <h4>Carregando informações...</h4>
+        </div>
+    }
+
+    <a class="btn btn-dark" href="/tickets/create"><span class="oi oi-plus" aria-hidden="true"></span> Adicionar</a>
     <br />
     <table class="table table-responsive">
         <thead>
@@ -43,7 +44,7 @@ else
 }
 
 @code {
-    private List<SupportTicketReadOnlyDto> Tickets;
+    private List<SupportTicketReadOnlyDto> Tickets = new();
     private Response<List<SupportTicketReadOnlyDto>> response = new() { Success = true };
 
     protected override async Task OnInitializedAsync()

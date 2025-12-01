@@ -52,7 +52,7 @@ namespace SuporteSpeed.API.Controllers
         // PUT: api/SupportTickets/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSupportTicket(int id, [FromForm] SupportTicketUpdateDto supportTicketDto)
+        public async Task<IActionResult> PutSupportTicket(int id, [FromBody] SupportTicketUpdateDto supportTicketDto)
         {
             if (id != supportTicketDto.Id)
             {
@@ -88,7 +88,7 @@ namespace SuporteSpeed.API.Controllers
         // POST: api/SupportTickets
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<SupportTicketCreateDto>> PostSupportTicket([FromForm] SupportTicketCreateDto supportTicketDto)
+        public async Task<ActionResult<SupportTicketCreateDto>> PostSupportTicket([FromBody] SupportTicketCreateDto supportTicketDto)
         {
             var supportTicket = mapper.Map<SupportTicket>(supportTicketDto);
             _context.SupportTickets.Add(supportTicket);

@@ -24,8 +24,14 @@ namespace SuporteSpeed.Blazor.Server.UI.Services.Base
             {
                 return new Response<Guid>() { Message = "O item requisitado não foi encontrado.", ValidationErrors = ex.Response, Success = false };
             }
+            
+            if (ex.StatusCode >= 200 && ex.StatusCode <= 299)
+            {
+                return new Response<Guid>() { Message = "Operação foi um sucesso.", Success = true };
+            }
 
             return new Response<Guid>() { Message = "Algo deu errado, por favor tente novamente.", ValidationErrors = ex.Response, Success = false };
+
         }
 
         protected async Task GetBearerToken()

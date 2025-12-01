@@ -20,7 +20,7 @@ namespace SuporteSpeed.API.DTOs.SupportTicket
 
         public virtual ICollection<HumanResponse> HumanResponses { get; set; } = new List<HumanResponse>();
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         public string Name { get; set; }
     }
