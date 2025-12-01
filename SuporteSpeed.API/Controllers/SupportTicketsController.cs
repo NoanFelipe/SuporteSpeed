@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using SuporteSpeed.API.Data;
 using SuporteSpeed.API.DTOs.SupportTicket;
 using SuporteSpeed.API.Services.AI;
+using SuporteSpeed.API.Static;
 using System.Security.Claims;
 
 namespace SuporteSpeed.API.Controllers
@@ -27,9 +28,18 @@ namespace SuporteSpeed.API.Controllers
 
         // GET: api/SupportTickets
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<SupportTicketReadOnlyDto>>> GetSupportTickets()
         {
+            var userId = User.FindFirstValue(CustomClaimTypes.Uid);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
             var supportTickets = await _context.SupportTickets
+                .Where(t => t.UserId == userId)
                 .Include(q => q.User)
                 .ProjectTo<SupportTicketReadOnlyDto>(mapper.ConfigurationProvider)
                 .ToListAsync();
@@ -37,11 +47,19 @@ namespace SuporteSpeed.API.Controllers
             return Ok(supportTickets);
         }
 
-        // GET: api/SupportTickets/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<SupportTicketDetailsDto>> GetSupportTicket(int id)
         {
+            var userId = User.FindFirstValue(CustomClaimTypes.Uid);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
             var supportTicket = await _context.SupportTickets
+                .Where(t => t.UserId == userId)
                 .Include(q => q.User)
                 .ProjectTo<SupportTicketDetailsDto>(mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync(q => q.Id == id);
@@ -137,9 +155,17 @@ namespace SuporteSpeed.API.Controllers
         [Authorize]
         public async Task<ActionResult<IEnumerable<SupportTicketAiViewDto>>> GetTicketsWithAi()
         {
+            var userId = User.FindFirstValue(CustomClaimTypes.Uid);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
             const string ErrorSignature = "Erro ao comunicar com a IA:";
 
             var ticketsFromDb = await _context.SupportTickets
+                .Where(t => t.UserId == userId)
                 .Include(t => t.Airesponses)
                 .ToListAsync();
 
